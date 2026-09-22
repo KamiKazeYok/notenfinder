@@ -13,32 +13,67 @@
 <main class="app">
 
 <header>
-<h1>Notenfinder</h1>
-<p>Note sehen → Taste suchen → richtig spielen</p>
+  <h1>Notenfinder</h1>
+  <p>Note sehen → Taste suchen → richtig spielen</p>
 </header>
 
 <section class="card">
-<div class="top">
-<span id="counter">Demo-Note 1</span>
-<button id="newBtn">Neue Note</button>
-</div>
 
-<div class="staff" id="staff" aria-label="Aktuelle Note"></div>
+  <div class="top">
+    <span id="counter">Demo-Note 1 von 8</span>
+    <button id="newBtn">Neue Note</button>
+  </div>
 
-<div id="message" class="message">
-Suche die Note auf dem Klavier.
-</div>
+  <div class="staff" id="staff"></div>
+
+  <div id="message" class="message">
+    Suche die Note auf dem Klavier.
+  </div>
+
 </section>
 
 <section class="card keyboard-card">
-<div class="keyboard" id="keyboard"></div>
+
+  <div class="keyboard-settings">
+
+    <div class="range-title">
+      <strong>Bereich:</strong>
+    </div>
+
+    <button class="range-btn active" data-range="practice">
+      H1 – E4
+    </button>
+
+    <button class="range-btn" data-range="full">
+      A0 – C8
+    </button>
+
+    <button class="range-btn" data-range="custom">
+      Eigener Bereich
+    </button>
+
+    <button id="namesBtn" class="names-btn">
+      Tastennamen
+    </button>
+
+  </div>
+
+  <div class="keyboard-wrapper">
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+
+  <div class="swipe-hint">
+    ← Nach links und rechts wischen →
+  </div>
+
 </section>
 
 <section class="card info">
-<strong>So funktioniert es:</strong>
-Es gibt keinen Timer und keine vorgegebene Taste.
-Eine falsche Taste lässt die Note stehen.
-Erst die richtige Taste bringt dich weiter.
+  <strong>So funktioniert es:</strong>
+  Es gibt keinen Timer und keinen Zeitdruck.
+  Suche die Taste, die zur Note gehört.
+  Bei einer falschen Taste bleibt die Note stehen.
+  Bei der richtigen Taste kommt die nächste Note.
 </section>
 
 </main>
