@@ -72,13 +72,28 @@ header p {
 
 .keyboard-card {
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  padding: 10px;
+}
+
+.keyboard-card::before {
+  content: "88 Tasten · nach links und rechts wischen";
+  display: block;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
 }
 
 .keyboard {
   height: 190px;
   position: relative;
-  min-width: 900px;
-  margin: auto;
+  width: 2184px;
+  min-width: 2184px;
+  margin: 0;
+}
 }
 
 .white {
@@ -139,10 +154,19 @@ header p {
   }
 
   .keyboard {
-    min-width: 900px;
+    width: 2184px;
+    min-width: 2184px;
   }
 
   .keyboard-card {
     padding: 10px;
+  }
+}
+  }
+
+  .keyboard-card {
+    padding: 10px;
+  }
+}
   }
 }
