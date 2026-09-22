@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+<title>Notenfinder</title>
+</head>
+
+<body>
+<main class="app">
+
+<header>
+<h1>Notenfinder</h1>
+<p>Note sehen → Taste suchen → richtig spielen</p>
+</header>
+
+<section class="card">
+<div class="top">
+<span id="counter">Demo-Note 1</span>
+<button id="newBtn">Neue Note</button>
+</div>
+
+<div class="staff" id="staff" aria-label="Aktuelle Note"></div>
+
+<div id="message" class="message">
+Suche die Note auf dem Klavier.
+</div>
+</section>
+
+<section class="card keyboard-card">
+<div class="keyboard" id="keyboard"></div>
+</section>
+
+<section class="card info">
+<strong>So funktioniert es:</strong>
+Es gibt keinen Timer und keine vorgegebene Taste.
+Eine falsche Taste lässt die Note stehen.
+Erst die richtige Taste bringt dich weiter.
+</section>
+
+</main>
+
+<script src="app.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+</html>
