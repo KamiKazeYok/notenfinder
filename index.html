@@ -16,7 +16,50 @@
   <h1>Notenfinder</h1>
   <p>Note sehen → Taste suchen → richtig spielen</p>
 </header>
+<section class="card sheet-upload">
 
+  <h2>🎼 Notenblatt</h2>
+
+  <p class="upload-text">
+    Fotografiere dein Notenblatt oder wähle ein Bild aus der Galerie.
+  </p>
+
+  <div class="upload-buttons">
+
+    <label class="upload-button">
+      📷 Foto aufnehmen
+      <input
+        id="cameraInput"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+      >
+    </label>
+
+    <label class="upload-button">
+      🖼️ Aus Galerie wählen
+      <input
+        id="galleryInput"
+        type="file"
+        accept="image/*"
+        hidden
+      >
+    </label>
+
+  </div>
+
+  <div id="sheetPreview" class="sheet-preview"></div>
+
+  <button
+    id="recognizeBtn"
+    class="recognize-button"
+    hidden
+  >
+    🎼 Notenblatt erkennen
+  </button>
+
+</section>
 <section class="card">
 
   <div class="top">
