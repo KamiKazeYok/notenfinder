@@ -1,4 +1,4 @@
-const CACHE_NAME = "notenfinder-v2";
+const CACHE_NAME = "notenfinder-v3";
 
 const FILES_TO_CACHE = [
   "./",
