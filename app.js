@@ -1,32 +1,21 @@
 let notes = [
-  { n: "C4", clef: "treble" },
-  { n: "E4", clef: "treble" },
-  { n: "G4", clef: "treble" },
-  { n: "F3", clef: "bass" },
-  { n: "A3", clef: "bass" },
-  { n: "C4", clef: "bass" },
-  { n: "D5", clef: "treble" },
-  { n: "B3", clef: "treble" }
+  { n: "C4", clef: "treble", midi: 60 },
+  { n: "E4", clef: "treble", midi: 64 },
+  { n: "G4", clef: "treble", midi: 67 },
+  { n: "F3", clef: "bass", midi: 53 },
+  { n: "A3", clef: "bass", midi: 57 },
+  { n: "C4", clef: "bass", midi: 60 },
+  { n: "D5", clef: "treble", midi: 74 },
+  { n: "B3", clef: "treble", midi: 59 }
 ];
 
 let index = 0;
 let showNames = true;
 
 const ranges = {
-  practice: {
-    start: 40,
-    end: 93
-  },
-
-  full: {
-    start: 21,
-    end: 108
-  },
-
-  custom: {
-    start: 40,
-    end: 93
-  }
+  practice: { start: 40, end: 93 },
+  full: { start: 21, end: 108 },
+  custom: { start: 40, end: 93 }
 };
 
 let currentRange = "practice";
@@ -37,16 +26,8 @@ const counter = document.querySelector("#counter");
 const keyboard = document.querySelector("#keyboard");
 const namesBtn = document.querySelector("#namesBtn");
 
-
-/* =========================
-   NOTEN / MIDI
-========================= */
-
 function noteToMidi(note) {
-
-  const match =
-    note.match(/^([A-G])(#|b)?(\d)$/);
-
+  const match = note.match(/^([A-G])(#|b)?(\d)$/);
   if (!match) return null;
 
   const base = {
@@ -59,9 +40,7 @@ function noteToMidi(note) {
     B: 11
   };
 
-  let midi =
-    12 * (Number(match[3]) + 1) +
-    base[match[1]];
+  let midi = 12 * (Number(match[3]) + 1) + base[match[1]];
 
   if (match[2] === "#") midi++;
   if (match[2] === "b") midi--;
@@ -69,9 +48,7 @@ function noteToMidi(note) {
   return midi;
 }
 
-
 function midiToGermanName(midi) {
-
   const names = [
     "C",
     "Cis",
@@ -87,31 +64,26 @@ function midiToGermanName(midi) {
     "H"
   ];
 
-  const octave =
-    Math.floor(midi / 12) - 1;
+  const octave = Math.floor(midi / 12) - 1;
 
   return names[midi % 12] + octave;
 }
 
-
 /* =========================
-   NOTENBLATT DARSTELLEN
+   NOTENZEILE
 ========================= */
 
 function drawNote() {
-
   const current = notes[index];
 
-  counter.textContent =
-    `Note ${index + 1} von ${notes.length}`;
+  if (!current) return;
 
-  message.textContent =
-    "Suche die Note auf dem Klavier.";
+  counter.textContent = `Note ${index + 1} von ${notes.length}`;
+  message.textContent = "Suche die Note auf dem Klavier.";
 
   const lines = [55, 75, 95, 115, 135];
 
   const treblePositions = {
-
     C4: 155,
     D4: 145,
     E4: 135,
@@ -119,18 +91,15 @@ function drawNote() {
     G4: 115,
     A4: 105,
     B4: 95,
-
     C5: 85,
     D5: 75,
     E5: 65,
-
     F5: 55,
     G5: 45,
     A5: 35
   };
 
   const bassPositions = {
-
     C2: 215,
     D2: 205,
     E2: 195,
@@ -138,7 +107,6 @@ function drawNote() {
     G2: 175,
     A2: 165,
     B2: 155,
-
     C3: 145,
     D3: 135,
     E3: 125,
@@ -146,33 +114,24 @@ function drawNote() {
     G3: 105,
     A3: 95,
     B3: 85,
-
     C4: 75
   };
 
   const positions =
-    current.clef === "treble"
-      ? treblePositions
-      : bassPositions;
+    current.clef === "bass"
+      ? bassPositions
+      : treblePositions;
 
-  const noteY =
-    positions[current.n] ?? 95;
-
+  const noteY = positions[current.n] ?? 95;
   const noteX = 250;
 
   let extraLines = "";
 
-  if (
-    noteY < 55 ||
-    noteY > 135
-  ) {
-
+  if (noteY < 55 || noteY > 135) {
     const nearestLine =
-      Math.round(
-        (noteY - 55) / 20
-      ) * 20 + 55;
+      Math.round((noteY - 55) / 20) * 20 + 55;
 
-    extraLines += `
+    extraLines = `
       <line
         x1="${noteX - 22}"
         y1="${nearestLine}"
@@ -188,16 +147,9 @@ function drawNote() {
     <svg viewBox="0 0 700 210">
 
       <g stroke="#333" stroke-width="2">
-
-        ${lines.map(y => `
-          <line
-            x1="45"
-            y1="${y}"
-            x2="660"
-            y2="${y}"
-          />
-        `).join("")}
-
+        ${lines.map(y =>
+          `<line x1="45" y1="${y}" x2="660" y2="${y}" />`
+        ).join("")}
       </g>
 
       <text
@@ -206,9 +158,7 @@ function drawNote() {
         font-size="70"
         font-family="serif"
       >
-        ${current.clef === "treble"
-          ? "𝄞"
-          : "𝄢"}
+        ${current.clef === "bass" ? "𝄢" : "𝄞"}
       </text>
 
       ${extraLines}
@@ -219,9 +169,7 @@ function drawNote() {
         rx="12"
         ry="9"
         fill="#111827"
-        transform="
-          rotate(-18 ${noteX} ${noteY})
-        "
+        transform="rotate(-18 ${noteX} ${noteY})"
       />
 
       <line
@@ -237,20 +185,18 @@ function drawNote() {
   `;
 }
 
-
 /* =========================
    KLAVIER
 ========================= */
 
 function buildKeyboard() {
-
   keyboard.innerHTML = "";
 
-  const range =
-    ranges[currentRange];
+  const range = ranges[currentRange];
+  const blackNotes = [1, 3, 6, 8, 10];
 
-  const blackNotes =
-    [1, 3, 6, 8, 10];
+  const whiteWidth = 48;
+  const blackWidth = 30;
 
   let whiteCount = 0;
 
@@ -259,18 +205,10 @@ function buildKeyboard() {
     midi <= range.end;
     midi++
   ) {
-
-    if (
-      !blackNotes.includes(
-        midi % 12
-      )
-    ) {
+    if (!blackNotes.includes(midi % 12)) {
       whiteCount++;
     }
   }
-
-  const whiteWidth = 48;
-  const blackWidth = 30;
 
   let whiteIndex = 0;
 
@@ -279,37 +217,24 @@ function buildKeyboard() {
     midi <= range.end;
     midi++
   ) {
+    const pitchClass = midi % 12;
 
-    const pitchClass =
-      midi % 12;
-
-    if (
-      blackNotes.includes(pitchClass)
-    ) {
+    if (blackNotes.includes(pitchClass)) {
       continue;
     }
 
-    const key =
-      document.createElement("button");
+    const key = document.createElement("button");
 
     key.className = "white";
-
     key.dataset.midi = midi;
-
     key.type = "button";
 
-    key.style.width =
-      `${whiteWidth}px`;
-
-    key.style.left =
-      `${whiteIndex * whiteWidth}px`;
+    key.style.width = `${whiteWidth}px`;
+    key.style.left = `${whiteIndex * whiteWidth}px`;
 
     if (showNames) {
-
       key.innerHTML =
-        `<span>
-          ${midiToGermanName(midi)}
-        </span>`;
+        `<span>${midiToGermanName(midi)}</span>`;
     }
 
     keyboard.appendChild(key);
@@ -324,35 +249,26 @@ function buildKeyboard() {
     midi <= range.end;
     midi++
   ) {
+    const pitchClass = midi % 12;
 
-    const pitchClass =
-      midi % 12;
+    if (blackNotes.includes(pitchClass)) {
 
-    if (
-      blackNotes.includes(pitchClass)
-    ) {
-
-      const key =
-        document.createElement("button");
+      const key = document.createElement("button");
 
       key.className = "black";
-
       key.dataset.midi = midi;
-
       key.type = "button";
 
-      key.style.width =
-        `${blackWidth}px`;
-
+      key.style.width = `${blackWidth}px`;
       key.style.left =
-        `${whiteIndex * whiteWidth -
-          blackWidth / 2}px`;
+        `${whiteIndex * whiteWidth - blackWidth / 2}px`;
 
       keyboard.appendChild(key);
 
     } else {
 
       whiteIndex++;
+
     }
   }
 
@@ -363,57 +279,46 @@ function buildKeyboard() {
     `${whiteCount * whiteWidth}px`;
 }
 
-
 /* =========================
-   TASTE DRÜCKEN
+   TASTEN
 ========================= */
 
 function handleKeyPress(event) {
 
   const key =
-    event.target.closest(
-      "[data-midi]"
-    );
+    event.target.closest("[data-midi]");
 
   if (!key) return;
 
   const selectedMidi =
     Number(key.dataset.midi);
 
+  const current = notes[index];
+
+  if (!current) return;
+
   const correctMidi =
-    notes[index].midi ??
-    noteToMidi(notes[index].n);
+    current.midi ?? noteToMidi(current.n);
 
-  if (
-    selectedMidi === correctMidi
-  ) {
+  if (selectedMidi === correctMidi) {
 
-    message.textContent =
-      "✓ Richtig!";
+    message.textContent = "✓ Richtig!";
 
     index++;
 
-    if (
-      index >= notes.length
-    ) {
+    if (index >= notes.length) {
 
       index = 0;
 
       message.textContent =
         "✓ Geschafft! Neue Runde beginnt.";
 
-      setTimeout(
-        drawNote,
-        700
-      );
+      setTimeout(drawNote, 700);
 
       return;
     }
 
-    setTimeout(
-      drawNote,
-      350
-    );
+    setTimeout(drawNote, 350);
 
   } else {
 
@@ -422,66 +327,51 @@ function handleKeyPress(event) {
   }
 }
 
-
 document.addEventListener(
   "click",
   handleKeyPress
 );
 
-
 /* =========================
-   NEUE RUNDE
+   NEUE NOTE
 ========================= */
 
 document
   .querySelector("#newBtn")
-  .addEventListener(
-    "click",
-    () => {
+  .addEventListener("click", () => {
 
-      index =
-        Math.floor(
-          Math.random() *
-          notes.length
-        );
+    index =
+      Math.floor(
+        Math.random() * notes.length
+      );
 
-      drawNote();
-    }
-  );
-
+    drawNote();
+  });
 
 /* =========================
-   TASTENBEREICH
+   BEREICH
 ========================= */
 
 document
   .querySelectorAll(".range-btn")
   .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+    button.addEventListener("click", () => {
 
-        currentRange =
-          button.dataset.range;
+      currentRange =
+        button.dataset.range;
 
-        document
-          .querySelectorAll(".range-btn")
-          .forEach(btn =>
-            btn.classList.remove(
-              "active"
-            )
-          );
-
-        button.classList.add(
-          "active"
+      document
+        .querySelectorAll(".range-btn")
+        .forEach(btn =>
+          btn.classList.remove("active")
         );
 
-        buildKeyboard();
-      }
-    );
-  });
+      button.classList.add("active");
 
+      buildKeyboard();
+    });
+  });
 
 /* =========================
    TASTENNAMEN
@@ -491,8 +381,7 @@ namesBtn.addEventListener(
   "click",
   () => {
 
-    showNames =
-      !showNames;
+    showNames = !showNames;
 
     namesBtn.textContent =
       showNames
@@ -503,49 +392,93 @@ namesBtn.addEventListener(
   }
 );
 
-
 window.addEventListener(
   "resize",
   buildKeyboard
 );
-
 
 /* =========================
    MUSICXML
 ========================= */
 
 const musicxmlInput =
-  document.querySelector(
-    "#musicxmlInput"
-  );
+  document.querySelector("#musicxmlInput");
 
 const musicxmlStatus =
-  document.querySelector(
-    "#musicxmlStatus"
+  document.querySelector("#musicxmlStatus");
+
+if (musicxmlInput) {
+
+  musicxmlInput.addEventListener(
+    "change",
+    async event => {
+
+      const file =
+        event.target.files &&
+        event.target.files[0];
+
+      if (!file) {
+        return;
+      }
+
+      if (musicxmlStatus) {
+        musicxmlStatus.textContent =
+          "⏳ MusicXML wird gelesen …";
+      }
+
+      try {
+
+        const xmlText =
+          await file.text();
+
+        console.log(
+          "MusicXML-Datei:",
+          file.name
+        );
+
+        console.log(
+          "Dateigröße:",
+          xmlText.length
+        );
+
+        readMusicXML(xmlText);
+
+      } catch (error) {
+
+        console.error(
+          "MusicXML-Fehler:",
+          error
+        );
+
+        if (musicxmlStatus) {
+          musicxmlStatus.textContent =
+            "❌ Fehler beim Lesen der MusicXML-Datei.";
+        }
+
+        message.textContent =
+          "Die Datei konnte nicht gelesen werden.";
+      }
+    }
   );
+}
 
+/* =========================
+   MUSICXML PITCH
+========================= */
 
-function pitchToMidi(
-  pitch
-) {
+function pitchToMidi(pitch) {
 
   const step =
-    pitch.querySelector(
-      "step"
-    )?.textContent;
+    pitch.querySelector("step")?.textContent;
 
   const octave =
     Number(
-      pitch.querySelector(
-        "octave"
-      )?.textContent
+      pitch.querySelector("octave")?.textContent
     );
 
   const alter =
     Number(
-      pitch.querySelector(
-        "alter"
-      )?.textContent || 0
+      pitch.querySelector("alter")?.textContent || 0
     );
 
   const base = {
@@ -572,18 +505,11 @@ function pitchToMidi(
   );
 }
 
+/* =========================
+   MUSICXML EINLESEN
+========================= */
 
-function midiToDisplayName(
-  midi
-) {
-
-  return midiToGermanName(midi);
-}
-
-
-function readMusicXML(
-  xmlText
-) {
+function readMusicXML(xmlText) {
 
   const parser =
     new DOMParser();
@@ -594,22 +520,14 @@ function readMusicXML(
       "application/xml"
     );
 
-  if (
-    xml.querySelector(
-      "parsererror"
-    )
-  ) {
+  const parserError =
+    xml.querySelector("parsererror");
+
+  if (parserError) {
     throw new Error(
       "MusicXML konnte nicht gelesen werden."
     );
   }
-
-
-  /*
-    Wir lesen die beiden Klaviersysteme.
-    G = Violinschlüssel
-    F = Bassschlüssel
-  */
 
   const clefs = {};
 
@@ -618,305 +536,215 @@ function readMusicXML(
     .forEach(clef => {
 
       const number =
-        clef.getAttribute(
-          "number"
-        ) || "1";
+        clef.getAttribute("number") || "1";
 
       const sign =
-        clef.querySelector(
-          "sign"
-        )?.textContent;
+        clef.querySelector("sign")?.textContent;
 
       if (sign === "G") {
-        clefs[number] =
-          "treble";
+        clefs[number] = "treble";
       }
 
       if (sign === "F") {
-        clefs[number] =
-          "bass";
+        clefs[number] = "bass";
       }
     });
-
 
   const imported = [];
 
   let absoluteMeasureTime = 0;
 
+  const measures =
+    xml.querySelectorAll(
+      "part > measure"
+    );
 
-  xml
-    .querySelectorAll("part > measure")
-    .forEach(
-      measure => {
+  measures.forEach(measure => {
 
-        let cursor = 0;
+    let cursor = 0;
+    let maxCursor = 0;
 
-        let maxCursor = 0;
+    const localNotes = [];
 
-        const localNotes = [];
+    measure.childNodes.forEach(node => {
 
-        measure
-          .childNodes
-          .forEach(node => {
+      if (
+        node.nodeType !==
+        Node.ELEMENT_NODE
+      ) {
+        return;
+      }
 
-            if (
-              node.nodeType !==
-              Node.ELEMENT_NODE
-            ) {
-              return;
-            }
+      const tag =
+        node.localName;
 
-            const tag =
-              node.localName;
+      /* BACKUP */
 
+      if (tag === "backup") {
 
-            /*
-              backup:
-              zurückspringen,
-              z.B. von rechter
-              auf linke Hand.
-            */
-
-            if (tag === "backup") {
-
-              const duration =
-                Number(
-                  node.querySelector(
-                    "duration"
-                  )?.textContent || 0
-                );
-
-              cursor -= duration;
-
-              return;
-            }
-
-
-            /*
-              forward:
-              Zeit vorspringen.
-            */
-
-            if (tag === "forward") {
-
-              const duration =
-                Number(
-                  node.querySelector(
-                    "duration"
-                  )?.textContent || 0
-                );
-
-              cursor += duration;
-
-              maxCursor =
-                Math.max(
-                  maxCursor,
-                  cursor
-                );
-
-              return;
-            }
-
-
-            if (tag !== "note") {
-              return;
-            }
-
-
-            const rest =
-              node.querySelector(
-                "rest"
-              );
-
-            const pitch =
-              node.querySelector(
-                "pitch"
-              );
-
-
-            /*
-              Pausen überspringen.
-            */
-
-            if (
-              rest ||
-              !pitch
-            ) {
-
-              const duration =
-                Number(
-                  node.querySelector(
-                    "duration"
-                  )?.textContent || 0
-                );
-
-              cursor += duration;
-
-              maxCursor =
-                Math.max(
-                  maxCursor,
-                  cursor
-                );
-
-              return;
-            }
-
-
-            const midi =
-              pitchToMidi(
-                pitch
-              );
-
-            if (
-              midi === null
-            ) {
-              return;
-            }
-
-
-            const staffNumber =
-              node.querySelector(
-                "staff"
-              )?.textContent || "1";
-
-
-            const duration =
-              Number(
-                node.querySelector(
-                  "duration"
-                )?.textContent || 0
-              );
-
-
-            /*
-              <chord> bedeutet:
-              Dieser Ton beginnt
-              gleichzeitig mit dem
-              vorherigen Ton.
-
-              Wir behandeln die Töne
-              zunächst einzeln, behalten
-              aber ihre gemeinsame Zeit.
-            */
-
-            const isChord =
-              !!node.querySelector(
-                "chord"
-              );
-
-            let noteTime =
-              cursor;
-
-            if (
-              isChord &&
-              localNotes.length
-            ) {
-
-              noteTime =
-                localNotes[
-                  localNotes.length - 1
-                ].localTime;
-            }
-
-
-            localNotes.push({
-
-              midi,
-
-              n:
-                midiToDisplayName(
-                  midi
-                ),
-
-              clef:
-                clefs[staffNumber] ||
-                (
-                  staffNumber === "2"
-                    ? "bass"
-                    : "treble"
-                ),
-
-              staff:
-                staffNumber,
-
-              localTime:
-                noteTime,
-
-              duration
-
-            });
-
-
-            if (!isChord) {
-
-              cursor += duration;
-
-              maxCursor =
-                Math.max(
-                  maxCursor,
-                  cursor
-                );
-            }
-
-          });
-
-
-        /*
-          Innerhalb eines Taktes:
-          zuerst zeitlich,
-          bei Gleichstand rechter
-          vor linker Hand.
-        */
-
-        localNotes
-          .sort(
-            (a, b) => {
-
-              if (
-                a.localTime !==
-                b.localTime
-              ) {
-
-                return (
-                  a.localTime -
-                  b.localTime
-                );
-              }
-
-              return (
-                Number(a.staff) -
-                Number(b.staff)
-              );
-            }
+        const duration =
+          Number(
+            node.querySelector(
+              "duration"
+            )?.textContent || 0
           );
 
+        cursor -= duration;
 
-        localNotes.forEach(
-          note => {
+        return;
+      }
 
-            imported.push({
+      /* FORWARD */
 
-              ...note,
+      if (tag === "forward") {
 
-              absoluteTime:
-                absoluteMeasureTime +
-                note.localTime
-            });
+        const duration =
+          Number(
+            node.querySelector(
+              "duration"
+            )?.textContent || 0
+          );
 
-          });
+        cursor += duration;
 
+        maxCursor =
+          Math.max(
+            maxCursor,
+            cursor
+          );
 
-        absoluteMeasureTime +=
-          maxCursor;
+        return;
+      }
 
+      if (tag !== "note") {
+        return;
+      }
+
+      const duration =
+        Number(
+          node.querySelector(
+            "duration"
+          )?.textContent || 0
+        );
+
+      const rest =
+        node.querySelector("rest");
+
+      const pitch =
+        node.querySelector("pitch");
+
+      /* PAUSE */
+
+      if (rest || !pitch) {
+
+        cursor += duration;
+
+        maxCursor =
+          Math.max(
+            maxCursor,
+            cursor
+          );
+
+        return;
+      }
+
+      const midi =
+        pitchToMidi(pitch);
+
+      if (midi === null) {
+        return;
+      }
+
+      const staffNumber =
+        node.querySelector(
+          "staff"
+        )?.textContent || "1";
+
+      const isChord =
+        !!node.querySelector("chord");
+
+      let noteTime = cursor;
+
+      if (
+        isChord &&
+        localNotes.length > 0
+      ) {
+
+        noteTime =
+          localNotes[
+            localNotes.length - 1
+          ].localTime;
+      }
+
+      localNotes.push({
+
+        midi: midi,
+
+        n: midiToGermanName(midi),
+
+        clef:
+          clefs[staffNumber] ||
+          (
+            staffNumber === "2"
+              ? "bass"
+              : "treble"
+          ),
+
+        staff: staffNumber,
+
+        localTime: noteTime,
+
+        duration: duration
+      });
+
+      if (!isChord) {
+
+        cursor += duration;
+
+        maxCursor =
+          Math.max(
+            maxCursor,
+            cursor
+          );
+      }
+    });
+
+    localNotes.sort(
+      (a, b) => {
+
+        if (
+          a.localTime !==
+          b.localTime
+        ) {
+
+          return (
+            a.localTime -
+            b.localTime
+          );
+        }
+
+        return (
+          Number(a.staff) -
+          Number(b.staff)
+        );
       }
     );
 
+    localNotes.forEach(note => {
 
-  /*
-    Endgültige musikalische
-    Reihenfolge.
-  */
+      imported.push({
+
+        ...note,
+
+        absoluteTime:
+          absoluteMeasureTime +
+          note.localTime
+      });
+    });
+
+    absoluteMeasureTime +=
+      maxCursor;
+  });
 
   imported.sort(
     (a, b) => {
@@ -939,38 +767,25 @@ function readMusicXML(
     }
   );
 
-
-  if (
-    imported.length === 0
-  ) {
+  if (imported.length === 0) {
 
     throw new Error(
       "Keine spielbaren Noten gefunden."
     );
   }
 
-
-  /*
-    Für unseren ersten
-    Trainingsmodus verwenden
-    wir einzelne Töne.
-  */
-
   notes =
-    imported.map(
-      note => ({
+    imported.map(note => ({
 
-        n: note.n,
+      n: note.n,
 
-        midi: note.midi,
+      midi: note.midi,
 
-        clef: note.clef,
+      clef: note.clef,
 
-        staff: note.staff
+      staff: note.staff
 
-      })
-    );
-
+    }));
 
   index = 0;
 
@@ -980,7 +795,7 @@ function readMusicXML(
     `Notenblatt: Note 1 von ${notes.length}`;
 
   message.textContent =
-    "Das Notenblatt wurde geladen. Suche die erste Note.";
+    "✓ Notenblatt geladen. Suche die erste Note.";
 
   if (musicxmlStatus) {
 
@@ -988,53 +803,6 @@ function readMusicXML(
       `✓ ${notes.length} spielbare Töne geladen.`;
   }
 }
-
-
-/* =========================
-   MUSICXML DATEI ÖFFNEN
-========================= */
-
-if (musicxmlInput) {
-
-  musicxmlInput.addEventListener(
-    "change",
-    async event => {
-console.log("MusicXML-Auswahl wurde erkannt");
-      const file =
-        event.target.files[0];
-
-      if (!file) return;
-
-      if (musicxmlStatus) {
-
-        musicxmlStatus.textContent =
-          "⏳ MusicXML wird gelesen …";
-      }
-
-      try {
-
-        const xmlText =
-          await file.text();
-
-        readMusicXML(
-          xmlText
-        );
-
-      } catch (error) {
-
-        console.error(error);
-
-        if (musicxmlStatus) {
-
-          musicxmlStatus.textContent =
-            "❌ Die MusicXML-Datei konnte nicht gelesen werden.";
-        }
-      }
-
-    }
-  );
-}
-
 
 /* =========================
    START
