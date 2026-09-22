@@ -14,9 +14,9 @@ let showNames = true;
 
 const ranges = {
   practice: {
-    start: 35,   // H1
-    end: 64      // E4
-  },
+  start: 40,   // E1
+  end: 93      // A6
+},
 
   full: {
     start: 21,   // A0
@@ -24,8 +24,9 @@ const ranges = {
   },
 
   custom: {
-    start: 35,
-    end: 64
+  start: 40,
+  end: 93
+}
   }
 };
 
@@ -210,14 +211,8 @@ function buildKeyboard() {
     Bei H1-E4 sollen ALLE Tasten gleichzeitig
     auf dem Bildschirm sichtbar sein.
   */
-  const availableWidth =
-    keyboard.parentElement.clientWidth - 4;
-
-  const whiteWidth =
-    Math.max(18, Math.floor(availableWidth / whiteCount));
-
-  const blackWidth =
-    Math.max(11, Math.floor(whiteWidth * 0.62));
+  const whiteWidth = 48;
+const blackWidth = 30;
 
   let whiteIndex = 0;
 
