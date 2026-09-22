@@ -431,12 +431,44 @@ galleryInput.addEventListener(
 
 recognizeBtn.addEventListener(
   "click",
-  () => {
+  async () => {
 
-    alert(
-      "Das Notenblatt wurde ausgewählt. " +
-      "Die eigentliche Notenerkennung kommt als nächster Schritt."
+    if (!cameraInput.files[0] && !galleryInput.files[0]) {
+      alert("Bitte zuerst ein Notenblatt auswählen.");
+      return;
+    }
+
+    recognizeBtn.disabled = true;
+    recognizeBtn.textContent = "⏳ Notenblatt wird analysiert …";
+
+    sheetPreview.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div id="recognitionStatus" class="recognition-status">
+          🎼 Bereite Notenblatt für die Notenerkennung vor …
+        </div>
+      `
     );
+
+    /*
+      Hier wird später der OMR-Dienst angeschlossen.
+    */
+
+    setTimeout(() => {
+
+      const status =
+        document.querySelector("#recognitionStatus");
+
+      if (status) {
+        status.textContent =
+          "ℹ️ Die automatische Notenerkennung wird als nächster Schritt angeschlossen.";
+      }
+
+      recognizeBtn.disabled = false;
+      recognizeBtn.textContent =
+        "🎼 Notenblatt erkennen";
+
+    }, 800);
 
   }
 );
