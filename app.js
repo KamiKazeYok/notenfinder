@@ -1,4 +1,75 @@
-let notes = [
+/* =========================
+   BILD AUS NOTENBLATT
+========================= */
+
+const cameraInput =
+  document.querySelector("#cameraInput");
+
+const galleryInput =
+  document.querySelector("#galleryInput");
+
+const sheetPreview =
+  document.querySelector("#sheetPreview");
+
+const recognizeBtn =
+  document.querySelector("#recognizeBtn");
+
+let selectedSheetImage = null;
+
+function showSheetImage(file) {
+
+  if (!file) return;
+
+  selectedSheetImage = file;
+
+  const imageUrl =
+    URL.createObjectURL(file);
+
+  sheetPreview.innerHTML = `
+    <img
+      src="${imageUrl}"
+      alt="Ausgewähltes Notenblatt"
+    >
+  `;
+
+  recognizeBtn.hidden = false;
+
+  const status =
+    document.querySelector("#musicxmlStatus");
+
+  if (status) {
+    status.textContent =
+      "✓ Notenblatt ausgewählt. Bereit zur Erkennung.";
+  }
+}
+
+if (cameraInput) {
+
+  cameraInput.addEventListener(
+    "change",
+    event => {
+
+      showSheetImage(
+        event.target.files[0]
+      );
+
+    }
+  );
+}
+
+if (galleryInput) {
+
+  galleryInput.addEventListener(
+    "change",
+    event => {
+
+      showSheetImage(
+        event.target.files[0]
+      );
+
+    }
+  );
+} let notes = [
   { n: "C4", clef: "treble", midi: 60 },
   { n: "E4", clef: "treble", midi: 64 },
   { n: "G4", clef: "treble", midi: 67 },
