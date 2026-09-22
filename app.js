@@ -10,13 +10,35 @@ const notes = [
 ];
 
 let index = 0;
-let finished = false;
+let showNames = true;
+
+const ranges = {
+  practice: {
+    start: 23,   // H1
+    end: 64      // E4
+  },
+
+  full: {
+    start: 21,   // A0
+    end: 108     // C8
+  },
+
+  custom: {
+    start: 23,
+    end: 64
+  }
+};
+
+let currentRange = "practice";
 
 const staff = document.querySelector("#staff");
 const message = document.querySelector("#message");
 const counter = document.querySelector("#counter");
+const keyboard = document.querySelector("#keyboard");
+const namesBtn = document.querySelector("#namesBtn");
 
 function noteToMidi(note) {
+
   const match = note.match(/^([A-G])(#|b)?(\d)$/);
 
   if (!match) return null;
@@ -31,20 +53,42 @@ function noteToMidi(note) {
     B: 11
   };
 
-  let value =
+  let midi =
     12 * (Number(match[3]) + 1) +
     base[match[1]];
 
-  if (match[2] === "#") value++;
-  if (match[2] === "b") value--;
+  if (match[2] === "#") midi++;
+  if (match[2] === "b") midi--;
 
-  return value;
+  return midi;
+}
+
+function midiToGermanName(midi) {
+
+  const names = [
+    "C",
+    "Cis",
+    "D",
+    "Dis",
+    "E",
+    "F",
+    "Fis",
+    "G",
+    "Gis",
+    "A",
+    "B",
+    "H"
+  ];
+
+  const octave =
+    Math.floor(midi / 12) - 1;
+
+  return names[midi % 12] + octave;
 }
 
 function drawNote() {
-  const current = notes[index];
 
-  finished = false;
+  const current = notes[index];
 
   counter.textContent =
     `Demo-Note ${index + 1} von ${notes.length}`;
@@ -84,31 +128,20 @@ function drawNote() {
       ? treblePositions
       : bassPositions;
 
-  const noteY = positions[current.n] ?? 95;
+  const noteY =
+    positions[current.n] ?? 95;
+
   const noteX = 140;
 
   let extraLines = "";
-
-  if (noteY < 55) {
-    extraLines += `
-      <line
-        x1="${noteX - 18}"
-        y1="55"
-        x2="${noteX + 18}"
-        y2="55"
-        stroke="#333"
-        stroke-width="2"
-      />
-    `;
-  }
 
   if (noteY > 135) {
     extraLines += `
       <line
         x1="${noteX - 18}"
-        y1="155"
+        y1="${noteY}"
         x2="${noteX + 18}"
-        y2="155"
+        y2="${noteY}"
         stroke="#333"
         stroke-width="2"
       />
@@ -169,70 +202,107 @@ function drawNote() {
 }
 
 function buildKeyboard() {
-  const keyboard = document.querySelector("#keyboard");
 
   keyboard.innerHTML = "";
 
-  const noteNames = [
-    "C", "C#", "D", "D#", "E", "F",
-    "F#", "G", "G#", "A", "A#", "B"
-  ];
+  const range = ranges[currentRange];
 
-  const blackPitchClasses = [1, 3, 6, 8, 10];
+  const whiteWidth =
+    window.innerWidth <= 600 ? 52 : 54;
+
+  const blackWidth =
+    window.innerWidth <= 600 ? 32 : 34;
 
   let whiteIndex = 0;
 
-  // 88 Tasten: A0 bis C8
-  for (let midi = 21; midi <= 108; midi++) {
+  /*
+    Zuerst alle weißen Tasten.
+  */
+
+  for (
+    let midi = range.start;
+    midi <= range.end;
+    midi++
+  ) {
+
     const pitchClass = midi % 12;
-    const name = noteNames[pitchClass];
-    const octave = Math.floor(midi / 12) - 1;
 
-    if (!name.includes("#")) {
-      const key = document.createElement("button");
+    const isBlack =
+      [1, 3, 6, 8, 10]
+        .includes(pitchClass);
 
-      key.className = "white";
-      key.dataset.midi = midi;
-      key.type = "button";
+    if (isBlack) continue;
 
-      key.innerHTML = `
-        <span>${name}${octave}</span>
-      `;
+    const key =
+      document.createElement("button");
 
-      keyboard.appendChild(key);
+    key.className = "white";
+    key.dataset.midi = midi;
+    key.type = "button";
 
-      whiteIndex++;
+    if (showNames) {
+
+      key.innerHTML =
+        `<span>${midiToGermanName(midi)}</span>`;
+
     }
+
+    key.style.left =
+      `${whiteIndex * whiteWidth}px`;
+
+    keyboard.appendChild(key);
+
+    whiteIndex++;
   }
 
-  // Schwarze Tasten
+  /*
+    Danach die schwarzen Tasten.
+  */
+
   whiteIndex = 0;
 
-  for (let midi = 21; midi <= 108; midi++) {
+  for (
+    let midi = range.start;
+    midi <= range.end;
+    midi++
+  ) {
+
     const pitchClass = midi % 12;
 
-    if (blackPitchClasses.includes(pitchClass)) {
-      const key = document.createElement("button");
+    const isBlack =
+      [1, 3, 6, 8, 10]
+        .includes(pitchClass);
+
+    if (isBlack) {
+
+      const key =
+        document.createElement("button");
 
       key.className = "black";
       key.dataset.midi = midi;
       key.type = "button";
 
-      // Position zwischen den weißen Tasten
       key.style.left =
-        `${whiteIndex * 42}px`;
+        `${whiteIndex * whiteWidth - blackWidth / 2}px`;
 
       keyboard.appendChild(key);
+
     } else {
+
       whiteIndex++;
     }
   }
+
+  keyboard.style.width =
+    `${whiteIndex * whiteWidth}px`;
 }
 
 function handleKeyPress(event) {
-  const key = event.target.closest("[data-midi]");
 
-  if (!key || finished) return;
+  const key =
+    event.target.closest("[data-midi]");
+
+  if (!key) return;
 
   const selectedMidi =
     Number(key.dataset.midi);
@@ -248,26 +318,23 @@ function handleKeyPress(event) {
     index++;
 
     if (index >= notes.length) {
-      finished = true;
 
-      counter.textContent =
-        "Alle Demo-Noten geschafft!";
+      index = 0;
 
       message.textContent =
-        "✓ Geschafft! Tippe auf „Neue Note“ für eine neue Runde.";
+        "✓ Geschafft! Neue Runde beginnt.";
+
+      setTimeout(drawNote, 600);
 
       return;
     }
 
-    setTimeout(() => {
-      drawNote();
-    }, 350);
+    setTimeout(drawNote, 350);
 
   } else {
 
     message.textContent =
       "Noch nicht – suche weiter.";
-
   }
 }
 
@@ -286,6 +353,46 @@ document.querySelector("#newBtn")
 
     drawNote();
   });
+
+document.querySelectorAll(".range-btn")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      currentRange =
+        button.dataset.range;
+
+      document
+        .querySelectorAll(".range-btn")
+        .forEach(btn =>
+          btn.classList.remove("active")
+        );
+
+      button.classList.add("active");
+
+      buildKeyboard();
+    });
+  });
+
+namesBtn.addEventListener(
+  "click",
+  () => {
+
+    showNames = !showNames;
+
+    namesBtn.textContent =
+      showNames
+        ? "Tastennamen ausblenden"
+        : "Tastennamen anzeigen";
+
+    buildKeyboard();
+  }
+);
+
+window.addEventListener(
+  "resize",
+  buildKeyboard
+);
 
 buildKeyboard();
 drawNote();
