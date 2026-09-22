@@ -275,3 +275,11 @@ header p {
     text-align: center;
   }
 }
+.recognition-status {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  text-align: center;
+  font-weight: 600;
+}
