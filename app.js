@@ -23,10 +23,9 @@ const ranges = {
     end: 108     // C8
   },
 
-  custom: {
-  start: 40,
-  end: 93
-}
+    custom: {
+    start: 40,
+    end: 93
   }
 };
 
