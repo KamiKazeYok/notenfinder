@@ -999,7 +999,7 @@ if (musicxmlInput) {
   musicxmlInput.addEventListener(
     "change",
     async event => {
-
+console.log("MusicXML-Auswahl wurde erkannt");
       const file =
         event.target.files[0];
 
