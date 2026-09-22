@@ -120,7 +120,7 @@ header p {
   position: relative;
   height: 210px;
   width: max-content;
-  min-width: 100%;
+  min-width: 1872px;
   padding: 0;
 }
 
@@ -128,7 +128,7 @@ header p {
   position: absolute;
   top: 0;
   height: 205px;
-  width: 54px;
+  width: 48px;
   background: white;
   border: 1px solid #333;
   border-top: 0;
@@ -145,7 +145,7 @@ header p {
 .black {
   position: absolute;
   top: 0;
-  width: 34px;
+  width: 30px;
   height: 125px;
   background: #111827;
   border: 1px solid #000;
@@ -153,7 +153,6 @@ header p {
   padding: 0;
   z-index: 3;
 }
-
 .black:active {
   background: #374151;
 }
