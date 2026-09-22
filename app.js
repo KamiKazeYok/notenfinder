@@ -14,7 +14,7 @@ let showNames = true;
 
 const ranges = {
   practice: {
-    start: 23,   // H1
+    start: 35,   // H1
     end: 64      // E4
   },
 
@@ -24,7 +24,7 @@ const ranges = {
   },
 
   custom: {
-    start: 23,
+    start: 35,
     end: 64
   }
 };
@@ -38,7 +38,6 @@ const keyboard = document.querySelector("#keyboard");
 const namesBtn = document.querySelector("#namesBtn");
 
 function noteToMidi(note) {
-
   const match = note.match(/^([A-G])(#|b)?(\d)$/);
 
   if (!match) return null;
@@ -64,7 +63,6 @@ function noteToMidi(note) {
 }
 
 function midiToGermanName(midi) {
-
   const names = [
     "C",
     "Cis",
@@ -87,7 +85,6 @@ function midiToGermanName(midi) {
 }
 
 function drawNote() {
-
   const current = notes[index];
 
   counter.textContent =
@@ -149,12 +146,7 @@ function drawNote() {
   }
 
   staff.innerHTML = `
-    <svg
-      viewBox="0 0 700 210"
-      role="img"
-      aria-label="Aktuelle Musiknote"
-    >
-
+    <svg viewBox="0 0 700 210">
       <g stroke="#333" stroke-width="2">
         ${lines.map(y => `
           <line
@@ -183,9 +175,7 @@ function drawNote() {
         rx="12"
         ry="9"
         fill="#111827"
-        transform="
-          rotate(-18 ${noteX} ${noteY})
-        "
+        transform="rotate(-18 ${noteX} ${noteY})"
       />
 
       <line
@@ -196,42 +186,49 @@ function drawNote() {
         stroke="#111827"
         stroke-width="2"
       />
-
     </svg>
   `;
 }
 
 function buildKeyboard() {
-
   keyboard.innerHTML = "";
 
   const range = ranges[currentRange];
 
+  const blackNotes = [1, 3, 6, 8, 10];
+
+  // Zuerst zählen wir die weißen Tasten.
+  let whiteCount = 0;
+
+  for (let midi = range.start; midi <= range.end; midi++) {
+    if (!blackNotes.includes(midi % 12)) {
+      whiteCount++;
+    }
+  }
+
+  /*
+    Bei H1-E4 sollen ALLE Tasten gleichzeitig
+    auf dem Bildschirm sichtbar sein.
+  */
+  const availableWidth =
+    keyboard.parentElement.clientWidth - 4;
+
   const whiteWidth =
-    window.innerWidth <= 600 ? 52 : 54;
+    Math.max(18, Math.floor(availableWidth / whiteCount));
 
   const blackWidth =
-    window.innerWidth <= 600 ? 32 : 34;
+    Math.max(11, Math.floor(whiteWidth * 0.62));
 
   let whiteIndex = 0;
 
-  /*
-    Zuerst alle weißen Tasten.
-  */
-
-  for (
-    let midi = range.start;
-    midi <= range.end;
-    midi++
-  ) {
+  // Weiße Tasten
+  for (let midi = range.start; midi <= range.end; midi++) {
 
     const pitchClass = midi % 12;
 
-    const isBlack =
-      [1, 3, 6, 8, 10]
-        .includes(pitchClass);
-
-    if (isBlack) continue;
+    if (blackNotes.includes(pitchClass)) {
+      continue;
+    }
 
     const key =
       document.createElement("button");
@@ -240,40 +237,30 @@ function buildKeyboard() {
     key.dataset.midi = midi;
     key.type = "button";
 
-    if (showNames) {
-
-      key.innerHTML =
-        `<span>${midiToGermanName(midi)}</span>`;
-
-    }
+    key.style.width =
+      `${whiteWidth}px`;
 
     key.style.left =
       `${whiteIndex * whiteWidth}px`;
+
+    if (showNames) {
+      key.innerHTML =
+        `<span>${midiToGermanName(midi)}</span>`;
+    }
 
     keyboard.appendChild(key);
 
     whiteIndex++;
   }
 
-  /*
-    Danach die schwarzen Tasten.
-  */
-
+  // Schwarze Tasten
   whiteIndex = 0;
 
-  for (
-    let midi = range.start;
-    midi <= range.end;
-    midi++
-  ) {
+  for (let midi = range.start; midi <= range.end; midi++) {
 
     const pitchClass = midi % 12;
 
-    const isBlack =
-      [1, 3, 6, 8, 10]
-        .includes(pitchClass);
-
-    if (isBlack) {
+    if (blackNotes.includes(pitchClass)) {
 
       const key =
         document.createElement("button");
@@ -281,6 +268,9 @@ function buildKeyboard() {
       key.className = "black";
       key.dataset.midi = midi;
       key.type = "button";
+
+      key.style.width =
+        `${blackWidth}px`;
 
       key.style.left =
         `${whiteIndex * whiteWidth - blackWidth / 2}px`;
@@ -294,7 +284,10 @@ function buildKeyboard() {
   }
 
   keyboard.style.width =
-    `${whiteIndex * whiteWidth}px`;
+    `${whiteCount * whiteWidth}px`;
+
+  keyboard.style.minWidth =
+    `${whiteCount * whiteWidth}px`;
 }
 
 function handleKeyPress(event) {
@@ -318,7 +311,6 @@ function handleKeyPress(event) {
     index++;
 
     if (index >= notes.length) {
-
       index = 0;
 
       message.textContent =
@@ -374,20 +366,17 @@ document.querySelectorAll(".range-btn")
     });
   });
 
-namesBtn.addEventListener(
-  "click",
-  () => {
+namesBtn.addEventListener("click", () => {
 
-    showNames = !showNames;
+  showNames = !showNames;
 
-    namesBtn.textContent =
-      showNames
-        ? "Tastennamen ausblenden"
-        : "Tastennamen anzeigen";
+  namesBtn.textContent =
+    showNames
+      ? "Tastennamen ausblenden"
+      : "Tastennamen anzeigen";
 
-    buildKeyboard();
-  }
-);
+  buildKeyboard();
+});
 
 window.addEventListener(
   "resize",
