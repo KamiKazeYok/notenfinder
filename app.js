@@ -379,3 +379,64 @@ window.addEventListener(
 
 buildKeyboard();
 drawNote();
+const cameraInput =
+  document.querySelector("#cameraInput");
+
+const galleryInput =
+  document.querySelector("#galleryInput");
+
+const sheetPreview =
+  document.querySelector("#sheetPreview");
+
+const recognizeBtn =
+  document.querySelector("#recognizeBtn");
+
+function showSheet(file) {
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Bitte ein Bild auswählen.");
+    return;
+  }
+
+  const imageUrl =
+    URL.createObjectURL(file);
+
+  sheetPreview.innerHTML = `
+    <img
+      src="${imageUrl}"
+      alt="Ausgewähltes Notenblatt"
+    >
+  `;
+
+  recognizeBtn.hidden = false;
+  recognizeBtn.textContent =
+    "🎼 Notenblatt erkennen";
+}
+
+cameraInput.addEventListener(
+  "change",
+  event => {
+    showSheet(event.target.files[0]);
+  }
+);
+
+galleryInput.addEventListener(
+  "change",
+  event => {
+    showSheet(event.target.files[0]);
+  }
+);
+
+recognizeBtn.addEventListener(
+  "click",
+  () => {
+
+    alert(
+      "Das Notenblatt wurde ausgewählt. " +
+      "Die eigentliche Notenerkennung kommt als nächster Schritt."
+    );
+
+  }
+);
