@@ -472,3 +472,210 @@ recognizeBtn.addEventListener(
 
   }
 );
+const musicxmlInput =
+  document.querySelector("#musicxmlInput");
+
+const musicxmlStatus =
+  document.querySelector("#musicxmlStatus");
+
+
+function musicXmlPitchToMidi(noteElement) {
+
+  const pitch =
+    noteElement.querySelector("pitch");
+
+  if (!pitch) return null;
+
+  const step =
+    pitch.querySelector("step")?.textContent;
+
+  const octave =
+    Number(
+      pitch.querySelector("octave")?.textContent
+    );
+
+  const alter =
+    Number(
+      pitch.querySelector("alter")?.textContent || 0
+    );
+
+  const base = {
+    C: 0,
+    D: 2,
+    E: 4,
+    F: 5,
+    G: 7,
+    A: 9,
+    B: 11
+  };
+
+  if (!(step in base) || Number.isNaN(octave)) {
+    return null;
+  }
+
+  return (
+    12 * (octave + 1) +
+    base[step] +
+    alter
+  );
+}
+
+
+function midiToNoteName(midi) {
+
+  return midiToGermanName(midi);
+}
+
+
+function getClefForStaff(staffNumber, clefs) {
+
+  if (staffNumber === "2") {
+    return clefs["2"] || "bass";
+  }
+
+  return clefs["1"] || "treble";
+}
+
+
+function loadMusicXML(xmlText) {
+
+  const parser =
+    new DOMParser();
+
+  const xml =
+    parser.parseFromString(
+      xmlText,
+      "application/xml"
+    );
+
+  const parserError =
+    xml.querySelector("parsererror");
+
+  if (parserError) {
+    throw new Error(
+      "Die MusicXML-Datei konnte nicht gelesen werden."
+    );
+  }
+
+  const clefs = {};
+
+  xml.querySelectorAll("clef")
+    .forEach(clef => {
+
+      const number =
+        clef.getAttribute("number") || "1";
+
+      const sign =
+        clef.querySelector("sign")?.textContent;
+
+      if (sign === "F") {
+        clefs[number] = "bass";
+      }
+
+      if (sign === "G") {
+        clefs[number] = "treble";
+      }
+
+    });
+
+
+  const importedNotes = [];
+
+
+  xml.querySelectorAll("note")
+    .forEach(noteElement => {
+
+      // Pausen überspringen
+      if (noteElement.querySelector("rest")) {
+        return;
+      }
+
+      const midi =
+        musicXmlPitchToMidi(noteElement);
+
+      if (midi === null) {
+        return;
+      }
+
+      const staff =
+        noteElement.querySelector("staff")
+          ?.textContent || "1";
+
+      importedNotes.push({
+
+        n: midiToNoteName(midi),
+
+        midi: midi,
+
+        clef:
+          getClefForStaff(
+            staff,
+            clefs
+          ),
+
+        staff: staff
+
+      });
+
+    });
+
+
+  if (importedNotes.length === 0) {
+
+    throw new Error(
+      "Es wurden keine spielbaren Noten gefunden."
+    );
+
+  }
+
+
+  notes = importedNotes;
+
+  index = 0;
+
+  drawNote();
+
+
+  counter.textContent =
+    `Notenblatt: Note 1 von ${notes.length}`;
+
+  message.textContent =
+    "Das Notenblatt wurde geladen. Suche die erste Note.";
+
+
+  musicxmlStatus.textContent =
+    `✓ ${notes.length} Noten erkannt.`;
+
+}
+
+
+musicxmlInput.addEventListener(
+  "change",
+  async event => {
+
+    const file =
+      event.target.files[0];
+
+    if (!file) return;
+
+    musicxmlStatus.textContent =
+      "⏳ MusicXML wird gelesen …";
+
+    try {
+
+      const text =
+        await file.text();
+
+      loadMusicXML(text);
+
+    } catch (error) {
+
+      console.error(error);
+
+      musicxmlStatus.textContent =
+        "❌ Die Datei konnte nicht gelesen werden.";
+
+    }
+
+  }
+);
