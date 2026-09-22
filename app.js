@@ -1,4 +1,4 @@
-const notes = [
+let notes = [
   { n: "C4", clef: "treble" },
   { n: "E4", clef: "treble" },
   { n: "G4", clef: "treble" },
